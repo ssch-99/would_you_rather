@@ -1,9 +1,10 @@
 import React, {Component} from "react";
 import {connect} from "react-redux";
 import { Menu,Avatar } from 'antd';
-import { HomeOutlined, AppstoreOutlined, QuestionOutlined, BarsOutlined,UserOutlined,LogoutOutlined } from '@ant-design/icons';
+import { HomeOutlined, QuestionOutlined, BarsOutlined,LogoutOutlined } from '@ant-design/icons';
+import {NavLink, withRouter} from "react-router-dom";
+import {handleLogout} from "../actions/login";
 
-const { SubMenu } = Menu;
 class Nav extends Component {
     state = {
         current: 'mail',
@@ -14,7 +15,18 @@ class Nav extends Component {
         this.setState({
             current: e.key,
         });
+
+        if(e.key === "logout"){
+            this.logout()
+        }
     };
+
+    logout = () => {
+        console.log("logout")
+        const {dispatch} = this.props
+        dispatch(handleLogout())
+        this.props.history.push('/home')
+    }
 
     render() {
 
@@ -24,25 +36,19 @@ class Nav extends Component {
                     Would you rather?
                 </Menu.Item>
                 <Menu.Item key="home">
-                    <HomeOutlined />
-                    Home
+                    <NavLink to='/home' exact><HomeOutlined />Home</NavLink>
                 </Menu.Item>
                 <Menu.Item key="new">
-                    <QuestionOutlined />
-                    New Question
+                    <NavLink to='/add' exact><QuestionOutlined />New Question</NavLink>
                 </Menu.Item>
                 <Menu.Item key="leaderboard">
-                    <BarsOutlined />
-                    Leader Board
+                    <NavLink to='/leaderboard' exact> <BarsOutlined />Leader Board</NavLink>
                 </Menu.Item>
-
-                <Menu.Item key="loggedin">
-                    Sascha <Avatar size="small" icon={<UserOutlined />} />
+                <Menu.Item key="logout" style={{float: 'right'}}>
+                    <NavLink to='/logout' exact> <LogoutOutlined /> Logout</NavLink>
                 </Menu.Item>
-
-                <Menu.Item key="logout">
-                    <LogoutOutlined />
-                    Logout
+                <Menu.Item key="loggedin" style={{float: 'right'}}>
+                    {this.props.loggedInUser.name} <Avatar size="small" src={this.props.loggedInUser.avatarURL} />
                 </Menu.Item>
 
 
@@ -53,5 +59,13 @@ class Nav extends Component {
 
 
 }
+function mapStateToProps({loggedInUser}) {
 
-export default Nav
+    return {
+        loggedInUser
+    }
+
+}
+
+
+export default withRouter(connect(mapStateToProps)(Nav))
